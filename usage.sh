@@ -1,8 +1,20 @@
-#!/bin/sh
-cmd=$1
-arg=$2
+#!/bin/bash
+source $HOME/.bashrc
+source /home/caluckal/catkin_ws/devel/setup.bash
+echo $1
+echo $2
+echo $3
+base_name=$1
+kill_term=$2
+command_1=$3
+shift
+shift
+shift
+args=$@
 quit() {
     echo "Quitting"
+    echo $kill_term
+    rosnode kill $kill_term
     # ps -ef | grep "$cmd $arg" | grep -v grep | awk '{print $2}' | xargs -r kill -9
     # echo "KILL STRAY PROCESS USING: 'ps -ef | grep '<process>' | grep -v grep | awk '{print \$2}' | xargs -r kill -9'"
     exit 0
@@ -34,15 +46,16 @@ do
     cpu_util=`top -bn1 | grep '%Cpu(s)' | awk '{printf "%.2f",$2}'`
     echo $cpu_util
     sleep 0.5
-    echo "$mem_usage,$cpu_mhz,$cpu_util" >> res.csv
-    clear
+    echo "$mem_usage,$cpu_mhz,$cpu_util" >> $base_name.csv
+    # clear
     if [ $counter -gt 10 ]
         then
             if [ $a -eq $b ]
                 then
                     a=0
+                    printf "___________\n" >> $base_name.csv
                     # python3 ~/Desktop/test.py &
-                    $cmd $arg &
+                    $command_1 $args &
             fi
     else
         counter=$((counter+1))
